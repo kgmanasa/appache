@@ -13,20 +13,16 @@ jobs:
       uses: actions/checkout@v2
 
     - name: build and push Docker image
-      env:
-          USERNAME: ${{ secrets.USERNAME }}
-          PASSWORD: ${{ secrets.PASSWORD }}
-    # username and password is configured in git using secrets
-   run: |
-      docker buildx build \
-        --platform linux/amd64 \
-        --push \
-        --tag $USERNAME/my-demo:v0.2
-      - name: Deploy to ECS with cloud formation
-      uses: aws-actions/aws-cloudformation-action@v1
-      with:
-        stack-name: Demo-stack
-        region: us-east-1
-        template: cf.yml
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      run: |
+         docker buildx build \
+          --platform linux/amd64 \
+          --push \
+          --tag manasakg/my-demo:v0.2
+         - name: Deploy to ECS with cloud formation
+         uses: aws-actions/aws-cloudformation-action@v1
+         with:
+          stack-name: Demo-stack
+          region: us-east-1
+          template: cf.yml
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
