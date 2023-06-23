@@ -21,7 +21,7 @@ jobs:
       docker buildx build \
         --platform linux/amd64 \
         --push \
-        --tag $USERNAME/my-demo:v0.1
+        --tag $USERNAME/my-demo:v0.2
       - name: Deploy to ECS with cloud formation
       uses: aws-actions/aws-cloudformation-action@v1
       with:
