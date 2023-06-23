@@ -14,8 +14,8 @@ jobs:
       with:
           image: manasakg/my-demo:v0.2
           registry: docker.io
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
