@@ -12,7 +12,7 @@ jobs:
     - name: Docker Build & Push Action
       uses: mr-smithers-excellent/docker-build-push@v6.2
       with:
-       image: manasakg/demo
+       image: manasakg/my-demo
        registry: docker.io
        USERNAME: ${{ secrets.DOCKER_USERNAME }}
        PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
