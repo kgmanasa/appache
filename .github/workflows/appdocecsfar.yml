@@ -8,19 +8,21 @@ jobs:
   build-deploy:
    runs-on: ubuntu-latest
 
-   steps:
-    - name: checkout code
-      uses: actions/checkout@v2
+steps:
+  - name: Checkout code
+    uses: actions/checkout@v2
 
-    - name: build and push Docker image
-      run: |
-         docker buildx build \
-          --platform linux/amd64 \
-          --push \
-          --tag manasakg/my-demo:v0.2
-         - name: Deploy to ECS with cloud formation
-         uses: aws-actions/aws-cloudformation-action@v1
-         with:
+  - name: Build and push Docker images
+    uses: docker/build-push-action@v1
+    with:
+      USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      repository: manasakg/my-demo:v0.2
+      tag_with_ref: true
+      tag_with_sha: true
+  - name: Deploy to ECS with cloud formation
+    uses: aws-actions/aws-cloudformation-action@v1
+    with:
           stack-name: Demo-stack
           region: us-east-1
           template: cf.yml
