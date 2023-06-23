@@ -13,12 +13,12 @@ jobs:
 
     - name: Build and push Docker images
       uses: docker/build-push-action@v1
-       with:
-      USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      repository: manasakg/my-demo:v0.2
-      tag_with_ref: true
-      tag_with_sha: true
+      with:
+       USERNAME: ${{ secrets.DOCKER_USERNAME }}
+       PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+       repository: manasakg/my-demo:v0.2
+       tag_with_ref: true
+       tag_with_sha: true
     - name: Deploy to ECS with cloud formation
       uses: aws-actions/aws-cloudformation-action@v1
       with:
