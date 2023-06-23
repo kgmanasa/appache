@@ -1,9 +1,5 @@
-AWSTemplateFormatVersion: 2010-09-09
+AWSTemplateFormatVersion: '2010-09-09'
 Resources:
-  ECSCluster:
-    Type: 'AWS::ECS::Cluster'
-    Properties:
-      ClusterName: demo
   ECSTaskdefinition:
     Type: 'AWS::ECS::TaskDefinition'
     Properties:
@@ -11,35 +7,89 @@ Resources:
       CPU: 256
       Memory: 512
       NetworkMode: awsvpc
-      ExecutionRoleArn: #  task execution role created using roles
+      ExecutionRoleArn: arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
       requiresCompatibilities:
         - FARGATE
       containerDefinitions:
         - Name: "Demo-container"
-          Image: "manasakg/my-demo:v0.2" # docker image pushed from git
+          Image: "$USERNAME/my-demo:v0.1" # docker image pushed from git
           essential: true          
           portMappings:
-            - ContainerPort: 24224
-            - ContainerPort: 9200
+            - ContainerPort: 80
           LogConfiguration:
             LogDriver: awslogs
             Options:
               awslogs-group: demo-log
               awslogs-region: "us-east-1"
               aws-stream-prefis: "demo-log"
+  ECSCluster:
+    Type: 'AWS::ECS::Cluster'
+    Properties:
+      ClusterName: demo
   ECSservice:
     type: "AWS::ECS::service"
     Properties:
       cluster: !Ref ECSCluster
       DesiredCount: 1
       LaunchType: FARGATE
+      LoadBalancers:
+        - ContainerName: 
+          ContainerPort: 80
+          TargetGroupArn: !Ref TargetGroup
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
           SecurityGroups:
-            - sg- # ECSSecurityGroup
+            - sg-064b71da7d57df26a
           Subnets:
-            - subnet-1
-            - subnet-2
-      Taskdefinition: !Ref ECSTaskdefinition
+            - subnet-0a2f6d226c45267f1
+            - subnet-0ef2043d280ab3473    
+  TaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: Demorole
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 
+                - ecs-tasks.amazonaws.com
+                - ecs.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchFullAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess 
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties: 
+      Name: DemoloadBalancer
+      Scheme: internet-facing
+      Type: application
+      Subnets:
+       - subnet-0a2f6d226c45267f1
+       - subnet-0ef2043d280ab3473  
+      SecurityGroup:
+       - sg-064b71da7d57df26a
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: Demotarget
+      Port: 80
+      Protocol: HTTP
+      VpcID: 
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: !Ref HealthCheckPath
+      HealthCheckTimeoutSeconds: 5
+      UnhealthyThresholdCount: 2
+      HealthyThresholdCount: 2
+
+  ListenerHTTPS:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !Ref TargetGroup
+          Type: forward
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP        
               
