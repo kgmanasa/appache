@@ -21,5 +21,5 @@ jobs:
       uses: aws-actions/aws-cloudformation-github-deploy@v1
       with:
        name: MyStack
-       template: myStack.yaml
+       template: cf.yml
        parameter-overrides: "MyParam1=myValue,MyParam2=${{ secrets.MY_SECRET_VALUE }}"
