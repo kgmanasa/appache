@@ -16,11 +16,11 @@ jobs:
        registry: docker.io
        USERNAME: ${{ secrets.DOCKER_USERNAME }}
        PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
+    - name: Deploy to ECS with cloud formation
+      uses: aws-actions/aws-cloudformation-action@v1
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        stack-name: Demo-stack
-        aws-region: us-east-1
-        template: cf.yml
+          stack-name: Demo-stack
+          region: us-east-1
+          template: cf.yml
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
