@@ -1,0 +1,27 @@
+'on':
+  push:
+    branches:
+      - master
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v2
+      - name: build and push Docker image
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+        run: |
+          docker buildx build \
+           --platform linux/amd64 \
+           --push \
+           --tag $USERNAME/my-demo:v0.1
+      - name: Deploy ECS service with CloudFormation
+        uses: aws-actions/aws-cloudformation-action@v1
+        with:
+          stack-name: Demo-stack
+          region: us-east-1
+          template: cf.yml
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
