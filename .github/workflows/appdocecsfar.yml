@@ -25,4 +25,5 @@ jobs:
     - name: Deploy to AWS CloudFormation
       uses: aws-actions/aws-cloudformation-github-deploy@v1.0.3
       with:
+       name: test
        template: cf.yml
