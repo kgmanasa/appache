@@ -6,6 +6,10 @@ jobs:
   build-deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.PAT}}
       - name: checkout code
         uses: actions/checkout@v2
       - name: build and push Docker image
