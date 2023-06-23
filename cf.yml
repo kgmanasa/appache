@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  ECSCluster:
+    Type: 'AWS::ECS::Cluster'
+    Properties:
+      ClusterName: demo
+  ECSTaskdefinition:
+    Type: 'AWS::ECS::TaskDefinition'
+    Properties:
+      Family: demo-task
+      CPU: 256
+      Memory: 512
+      NetworkMode: awsvpc
+      ExecutionRoleArn: #  task execution role created using roles
+      requiresCompatibilities:
+        - FARGATE
+      containerDefinitions:
+        - Name: "Demo-container"
+          Image: "$USERNAME/my-demo:v0.1" # docker image pushed from git
+          essential: true          
+          portMappings:
+            - ContainerPort: 24224
+            - ContainerPort: 9200
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: demo-log
+              awslogs-region: "us-east-1"
+              aws-stream-prefis: "demo-log"
+  ECSservice:
+    type: "AWS::ECS::service"
+    Properties:
+      cluster: !Ref ECSCluster
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - sg- # ECSSecurityGroup
+          Subnets:
+            - subnet-1
+            - subnet-2
+      Taskdefinition: !Ref ECSTaskdefinition
+              
