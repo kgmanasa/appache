@@ -3,7 +3,8 @@ on:
   push:
    branches:
      - master
-
+jobs:
+  build-deploy:
    runs-on: ubuntu-latest
 
    steps:
@@ -14,7 +15,7 @@ on:
       env:
           USERNAME: ${{ secrets.USERNAME }}
           PASSWORD: ${{ secrets.PASSWORD }}
-
+    # username and password is configured in git using secrets
    run: |
       docker buildx build \
         --platform linux/amd64 \
