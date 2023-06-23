@@ -19,4 +19,12 @@ on:
       docker buildx build \
         --platform linux/amd64 \
         --push \
-        --tag $USERNAME/my-demo:v0.2
+        --tag $USERNAME/my-demo:v0.1
+      - name: Deploy to ECS with cloud formation
+      uses: aws-actions/aws-cloudformation-action@v1
+      with:
+        stack-name: Demo-stack
+        region: us-east-1
+        template: cf.yml
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
