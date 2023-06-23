@@ -18,7 +18,7 @@ jobs:
        tag_with_ref: true
        tag_with_sha: true
     - name: Deploy to ECS with cloud formation
-      uses: aws-actions/aws-cloudformation-action@v1
+      uses: aws-actions/aws-cloudformation-action@v2
       with:
           stack-name: Demo-stack
           region: us-east-1
