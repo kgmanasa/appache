@@ -12,7 +12,7 @@ Resources:
         - FARGATE
       containerDefinitions:
         - Name: "Demo-container"
-          Image: "$USERNAME/my-demo:v0.1" # docker image pushed from git
+          Image: "manasakg/my-demo:v0.2"
           essential: true          
           portMappings:
             - ContainerPort: 80
