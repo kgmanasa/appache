@@ -12,7 +12,7 @@ Resources:
         - FARGATE
       containerDefinitions:
         - Name: "Demo-container"
-          Image: "manasakg/my-demo:v0.2"
+          Image: "manasakg/my-demo:v0.1"
           essential: true          
           portMappings:
             - ContainerPort: 80
