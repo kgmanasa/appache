@@ -1,39 +1,75 @@
 AWSTemplateFormatVersion: '2010-09-09'
+Description: An example CloudFormation template for Fargate.
+
 Resources:
+  ECSCluster:
+    Type: 'AWS::ECS::Cluster'
+    Properties:
+          ClusterName: democluster
+      
   ECSTaskdefinition:
     Type: 'AWS::ECS::TaskDefinition'
     Properties:
       Family: demo-task
-      CPU: 256
-      Memory: 512
+      Cpu: .5 vCPU
+      Memory: 1 GB
       NetworkMode: awsvpc
-      ExecutionRoleArn: arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
-      requiresCompatibilities:
+      ExecutionRoleArn: arn:aws:iam::518214089835:role/ecs-role
+      RequiresCompatibilities:
         - FARGATE
-      containerDefinitions:
+      ContainerDefinitions:
         - Name: "Demo-container"
-          Image: "manasakg/my-demo:v0.1"
-          essential: true          
-          portMappings:
+          Image: "manasakg/my-appache:v2"
+          Essential: true          
+          PortMappings:
             - ContainerPort: 80
-          LogConfiguration:
-            LogDriver: awslogs
-            Options:
-              awslogs-group: demo-log
-              awslogs-region: "us-east-1"
-              aws-stream-prefis: "demo-log"
-  ECSCluster:
-    Type: 'AWS::ECS::Cluster'
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      ClusterName: demo
+      Type: application 
+      Name: DemoloadBalancer
+      Scheme: internet-facing
+      Subnets:
+       - subnet-0a2f6d226c45267f1
+       - subnet-0ef2043d280ab3473
+      SecurityGroups:
+            - sg-064b71da7d57df26a
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: Demotarget
+      Port: 80
+      Protocol: HTTP
+      VpcId: vpc-0fc64df872e7e2dcd
+      TargetType: ip
+      HealthCheckIntervalSeconds: 30
+      HealthCheckProtocol: HTTP
+      HealthCheckPath: /health
+      HealthCheckTimeoutSeconds: 5
+      UnhealthyThresholdCount: 2
+      HealthyThresholdCount: 2
+
+  ListenerHTTPS:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !Ref TargetGroup
+          Type: forward
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP            
   ECSservice:
-    type: "AWS::ECS::service"
+    Type: 'AWS::ECS::Service'
+    DependsOn:
+       - ListenerHTTPS
     Properties:
-      cluster: !Ref ECSCluster
-      DesiredCount: 1
+      Cluster: !Ref ECSCluster
+      ServiceName: demoservice
+      TaskDefinition: !Ref ECSTaskdefinition
+      DesiredCount: 2
       LaunchType: FARGATE
       LoadBalancers:
-        - ContainerName: 
+        - ContainerName: Demo-container
           ContainerPort: 80
           TargetGroupArn: !Ref TargetGroup
       NetworkConfiguration:
@@ -59,37 +95,13 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/CloudWatchFullAccess
         - arn:aws:iam::aws:policy/AmazonS3FullAccess 
-  LoadBalancer:
-    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
-    Properties: 
-      Name: DemoloadBalancer
-      Scheme: internet-facing
-      Type: application
-      Subnets:
-       - subnet-0a2f6d226c45267f1
-       - subnet-0ef2043d280ab3473  
-      SecurityGroup:
-       - sg-064b71da7d57df26a
-  TargetGroup:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
     Properties:
-      Name: Demotarget
-      Port: 80
-      Protocol: HTTP
-      VpcID: 
-      HealthCheckIntervalSeconds: 10
-      HealthCheckPath: !Ref HealthCheckPath
-      HealthCheckTimeoutSeconds: 5
-      UnhealthyThresholdCount: 2
-      HealthyThresholdCount: 2
-
-  ListenerHTTPS:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      DefaultActions:
-        - TargetGroupArn: !Ref TargetGroup
-          Type: forward
-      LoadBalancerArn: !Ref LoadBalancer
-      Port: 80
-      Protocol: HTTP        
-              
+      GroupDescription: allow traffic to containers
+      VpcId: vpc-0fc64df872e7e2dcd
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0 
