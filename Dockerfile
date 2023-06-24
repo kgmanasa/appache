@@ -1,5 +1,5 @@
 FROM ubuntu 
-RUN apt update && apt upgrade
+RUN apt-get update && apt-get -y upgrade
 RUN apt-get install apache2 -y
 RUN apt install httpd -y
 COPY index.html /var/www/html/
