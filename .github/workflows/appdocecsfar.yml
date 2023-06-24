@@ -28,3 +28,4 @@ jobs:
       with:
        name: test
        template: cf.yml
+       capabilities: CAPABILITY_IAM
