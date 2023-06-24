@@ -1,5 +1,5 @@
 FROM ubuntu 
-RUN apt update 
+RUN apt update && apt upgrade
 RUN apt install httpd -y
 COPY index.html /var/www/html/
 
