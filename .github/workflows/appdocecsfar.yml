@@ -12,8 +12,9 @@ jobs:
     - name: Docker Build & Push Action
       uses: mr-smithers-excellent/docker-build-push@v6.2
       with:
-       image: manasakg/my-demo
+       image: manasakg/my-appache
        registry: docker.io
+       tags: v1, latest
        USERNAME: ${{ secrets.DOCKER_USERNAME }}
        PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     - name: Configure AWS Credentials
