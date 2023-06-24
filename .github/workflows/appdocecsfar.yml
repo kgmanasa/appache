@@ -14,7 +14,7 @@ jobs:
       with:
        image: manasakg/my-appache
        registry: docker.io
-       tags: v1, latest
+       tags: v2
        USERNAME: ${{ secrets.DOCKER_USERNAME }}
        PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     - name: Configure AWS Credentials
